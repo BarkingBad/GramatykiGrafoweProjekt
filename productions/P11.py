@@ -1,6 +1,4 @@
 from common import *
-from data.VertexLabel import VertexLabel
-from util.SortUtils import sort_graph_fragments
 
 
 def P11(id1, id2, id3):
@@ -131,13 +129,6 @@ def P11_vertical_merge_bigger_square_on_left(id1, id2, id3):
 
     for fragment in graph_fragment_modified_list:
         vertexes_to_move += fragment.vertices
-
-    if top_right_vertex in vertexes_to_move:
-        vertexes_to_move.remove(top_right_vertex)
-    if middle_right_vertex in vertexes_to_move:
-        vertexes_to_move.remove(middle_right_vertex)
-    if bottom_right_vertex in vertexes_to_move:
-        vertexes_to_move.remove(bottom_right_vertex)
 
     vertexes_to_move = list(dict.fromkeys(vertexes_to_move))
 
