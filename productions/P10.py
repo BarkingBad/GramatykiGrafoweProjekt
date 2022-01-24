@@ -7,7 +7,6 @@ def P10(id):
     global graph_fragment_list
     graph_fragment = verticies_graph_fragment.get(id) # check if a graph fragment is registered as possible to extend to lower layers
     lower_layer_squares = resolve_lower_layer_squares(graph_fragment) # get squares which a new fragment on lower level will occupy
-    
     lower_left_vertice = find_lower_left_vertice(lower_layer_squares) # find the edge lowest vertice on the left
     
     lower_graph_fragment_width = math.sqrt(len(lower_layer_squares)) # length of a whole square (consisting of small squares) which the new graph fragment occupies
@@ -21,10 +20,31 @@ def P10(id):
     upper_right_vertice = find_vertice_with_coordinates_and_remove_duplicates(lower_right_vertice_x, upper_left_vertice_y, lower_layer_squares)
     middle_middle_vertice = find_vertice_with_coordinates_and_remove_duplicates(lower_middle_vertice_x, middle_left_vertice_y, lower_layer_squares)
 
-    square = Square(middle_middle_vertice.id, lower_layer_squares[0].layer_number)
+    upper_left_square = None
+    upper_right_square = None
+    lower_left_square = None
+    lower_right_square = None
+    for square in lower_layer_squares:
+        if upper_left_square == None or square.field_id < upper_left_square.field_id:
+            upper_left_square = square
+    layer_size = (2 ** upper_left_square.layer_number)
+    # identification of squares for each new graph fragment
+    for square in lower_layer_squares:
+        if upper_right_square is None and square.field_id == upper_left_square.field_id + lower_graph_fragment_width / 2:
+            upper_right_square = square
+        if lower_left_square is None and square.field_id == upper_left_square.field_id + (lower_graph_fragment_width / 2) * layer_size:
+            lower_left_square = square
+        if lower_right_square is None and square.field_id == (upper_left_square.field_id + (lower_graph_fragment_width / 2) * layer_size) + lower_graph_fragment_width / 2:
+            lower_right_square = square
+    upper_left_fragment_squares = return_graph_fragment_squares_from_upper_left_square(lower_layer_squares, upper_left_square)
+    upper_right_fragment_squares = return_graph_fragment_squares_from_upper_left_square(lower_layer_squares, upper_right_square)
+    lower_left_fragment_squares = return_graph_fragment_squares_from_upper_left_square(lower_layer_squares, lower_left_square)
+    lower_right_fragment_squares = return_graph_fragment_squares_from_upper_left_square(lower_layer_squares, lower_right_square)
+
+    square = Square(upper_left_square.field_id, lower_layer_squares[0].layer_number)
     square.vertices.append([upper_right_vertice, lower_left_vertice, lower_right_vertice, upper_left_vertice, middle_middle_vertice])
     upper_right_fragment = GraphFragment(
-        square, 
+        upper_left_fragment_squares + upper_right_fragment_squares + lower_left_fragment_squares + lower_right_fragment_squares, 
         [upper_right_vertice, lower_left_vertice, lower_right_vertice, upper_left_vertice, middle_middle_vertice],
          graph_fragment.layer_number + 1, 
          [(middle_middle_vertice.id, upper_right_vertice.id), (middle_middle_vertice.id, lower_left_vertice.id), (middle_middle_vertice.id, lower_right_vertice.id), (middle_middle_vertice.id, upper_left_vertice.id), 
